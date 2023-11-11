@@ -12,10 +12,9 @@ export class AppComponent {
   form!: FormGroup;
 
   constructor(vjDynamicFormService: VjDynamicFormService) {
-    this.form = vjDynamicFormService.build([{
+    this.form = vjDynamicFormService.buildGroup([{
       formControlName: 'firstName',
       label: 'First Name',
-      type: 'text',
       validations: [{
         fn: Validators.required,
         errorkey: Validators.required.name,
@@ -24,16 +23,14 @@ export class AppComponent {
     }, {
       formControlName: 'age',
       label: 'age',
-      type: 'number'
     }, {
       formControlName: 'note',
       label: 'Note',
-      type: 'textarea',
       validations: [{
         fn: Validators.required,
         errorkey: Validators.required.name,
         errorValue: 'The {{label}} is required'
-      },{
+      }, {
         fn: Validators.maxLength(10),
         errorkey: Validators.maxLength.name,
         errorValue: 'The {{label}} has more than 10 characteres'
