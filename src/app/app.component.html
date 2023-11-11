@@ -1,9 +1,14 @@
+<h1>Form Group</h1>
 <div [formGroup]="form">
-  <input formControlName="firstName">
+  <input placeholder="First Name" formControlName="firstName">
   <br>
   <br>
-  <input formControlName="age" type="number">
+  <input placeholder="Age" formControlName="age" type="number">
   <br>
   <br>
-  <textarea formControlName="note"></textarea>
+  <textarea placeholder="Note" formControlName="note"></textarea>
 </div>
+<br>
+<br>
+<h1>Form Control</h1>
+<input placeholder="City" [formControl]="formcontrol">

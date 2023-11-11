@@ -4,6 +4,6 @@ export type VjDynamicAbstractControlValidatorFn = {} | null;
 
 export class VjDynamicAbstractControl {
   formControlName!: string;
-  label?: string;
+  label!: string;
   validations?: Array<VjDynamicAbstractControlValidation>
 }

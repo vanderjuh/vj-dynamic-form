@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn } from '@angular/forms';
 
+import { debounceTime } from 'rxjs';
+
 import { VjDynamicAbstractControlValidation } from './classes/vj-dynamic-abstract-control-validation.class';
 import { VjDynamicAbstractControl, VjDynamicAbstractControlValidatorFn } from './classes/vj-dynamic-abstract-control.class';
 
@@ -9,10 +11,10 @@ export class VjDynamicFormService {
 
   private readonly labelArgumentKey = '{{label}}'
 
-  buildControl(validations: Array<VjDynamicAbstractControlValidation>, enableDebugger = false): FormControl {
-    const result = new FormControl(null, this.createAbstractControl({ formControlName: 'single', validations }));
+  buildControl(label: string, validations: Array<VjDynamicAbstractControlValidation>, enableDebugger = false): FormControl {
+    const result = this.createAbstractControl({ label, formControlName: '', validations });
     this.setDebbugMode(enableDebugger, result);
-    return result;
+    return (result as FormControl);
   }
 
   buildGroup(settings: Array<VjDynamicAbstractControl>, enableDebugger = false): FormGroup {
@@ -56,10 +58,12 @@ export class VjDynamicFormService {
 
   private setDebbugMode(enableDebugger: boolean, result: AbstractControl) {
     if (enableDebugger) {
-      result.valueChanges.subscribe(data => {
-        console.log('Form Data:', data);
-        console.log('Form Definition:', result);
-      });
+      result.valueChanges
+        .pipe(debounceTime(1500))
+        .subscribe(data => {
+          console.log('Form Data:', data);
+          console.log('Form Definition:', result);
+        });
     }
   }
 
@@ -68,7 +72,7 @@ export class VjDynamicFormService {
     if (controlSetting.validations?.length) {
       controlSetting.validations.forEach(fnSettings => {
         const fn = (control: AbstractControl): VjDynamicAbstractControlValidatorFn => {
-          const fnResult = fnSettings.fn(control);
+          const fnResult = fnSettings.validatorFn(control);
           if (fnResult) {
             return { [fnSettings.errorkey]: fnSettings.errorValue?.replace(this.labelArgumentKey, `"${controlSetting.label}"`) };
           }
@@ -77,6 +81,10 @@ export class VjDynamicFormService {
         validations.push(fn);
       })
     }
-    return new FormControl(null, validations);
+    const result = new FormControl(null);
+    if (validations?.length) {
+      result.addValidators(validations);
+    }
+    return result;
   }
 }
